@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUNKY STORAGE | FUNKY HOTDOG WORKS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- インダストリアル感とファンキーさを出すフォント -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Rajdhani:wght@500;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        oswald: ['Oswald', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                        sans: ['Noto Sans JP', 'sans-serif'],
+                    },
+                    colors: {
+                        fhw: {
+                            cyan: '#00f0ff',
+                            lime: '#ccff00',
+                            pink: '#ff0055',
+                            dark: '#0a0a0c',
+                            gray: '#1a1a1d',
+                        }
+                    },
+                    backgroundImage: {
+                        'metal-texture': 'linear-gradient(to bottom, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.2) 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスタイル・エフェクト */
+        body {
+            background-color: #0a0a0c;
+            color: #e4e4e7;
+        }
+
+        /* スモークエフェクト（擬似的な空間の奥行きのみ残す） */
+        .bg-smoke {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 近未来風カード装飾 */
+        .cyber-card {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+        }
+        
+        .cyber-button {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+        }
+
+        /* ライトモード時の調整 */
+        html.light body {
+            background-color: #f4f4f5;
+            color: #18181b;
+        }
+        html.light .fhw-card-bg {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased transition-colors duration-300 min-h-screen relative overflow-x-hidden selection:bg-fhw-lime selection:text-fhw-dark">
+
+    <!-- スモーク背景のみ -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="bg-smoke"></div>
+    </div>
+
+    <!-- ヘッダー -->
+    <header class="fixed top-0 w-full z-50 bg-fhw-dark/90 dark:bg-fhw-dark/90 light:bg-white/90 backdrop-blur-md border-b border-fhw-cyan/30 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            <!-- 左：ロゴ（後でGitHubの画像と差し替えるスペース） -->
+            <div class="flex-shrink-0 flex items-center cursor-pointer">
+                <!-- ▼ 画像URLを設定する ▼ -->
+                <!-- src="" の中にURLを入れて、hidden クラスを外してください -->
+                <img src="" alt="FHW LOGO" class="h-8 w-auto object-contain hidden">
+                
+                <!-- ▼ 画像を設定したら、この破線のdivブロックは削除してください ▼ -->
+                <div class="h-8 w-24 sm:w-32 border border-dashed border-fhw-cyan/50 flex items-center justify-center text-[10px] sm:text-xs text-fhw-cyan/50 font-rajdhani tracking-widest">
+                    LOGO HERE
+                </div>
+            </div>
+
+            <!-- 右：コントロール群 -->
+            <!-- モバイルで見切れないように gap を調整し、flex-shrink-0 で縮小を防ぐ -->
+            <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                <!-- 言語切り替え -->
+                <div class="flex items-center space-x-1 bg-black/50 border border-fhw-cyan/30 rounded-full px-2 py-1 text-xs sm:text-sm font-rajdhani">
+                    <button id="lang-en" class="opacity-100 hover:opacity-80 transition-opacity w-5 sm:w-6 text-center" onclick="setLang('en')">🇺🇸</button>
+                    <span class="text-fhw-cyan/50 text-[10px] sm:text-xs">|</span>
+                    <button id="lang-ja" class="opacity-40 hover:opacity-100 transition-opacity w-5 sm:w-6 text-center grayscale" onclick="setLang('ja')">🇯🇵</button>
+                </div>
+
+                <!-- ダーク/ライトモード切り替え -->
+                <div class="flex items-center space-x-1 bg-black/50 border border-fhw-cyan/30 rounded-full px-2 py-1 text-xs sm:text-sm">
+                    <button id="theme-dark" class="opacity-100 hover:opacity-80 transition-opacity w-5 sm:w-6 text-center" onclick="setTheme('dark')">🌙</button>
+                    <span class="text-fhw-cyan/50 text-[10px] sm:text-xs">|</span>
+                    <button id="theme-light" class="opacity-40 hover:opacity-100 transition-opacity w-5 sm:w-6 text-center grayscale" onclick="setTheme('light')">☀️</button>
+                </div>
+
+                <!-- メニューボタン -->
+                <button class="text-xl sm:text-2xl hover:scale-110 transition-transform focus:outline-none flex-shrink-0 ml-1" aria-label="Menu">
+                    🌭
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="pt-24 pb-16">
+        
+        <!-- ヒーローセクション -->
+        <section class="relative pt-16 pb-20 px-4 text-center">
+            
+            <div class="inline-block relative w-full">
+                <!-- 文字サイズを大幅にアップ。モバイルでは改行させる -->
+                <h1 class="font-oswald font-bold text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] tracking-[0.05em] text-white dark:text-white light:text-fhw-dark drop-shadow-[0_0_20px_rgba(0,240,255,0.4)] mb-4 relative z-10 leading-none">
+                    FUNKY<br class="md:hidden"> STORAGE
+                </h1>
+            </div>
+            
+            <!-- サブタイトル -->
+            <p class="font-rajdhani font-semibold text-fhw-cyan text-base md:text-xl tracking-[0.3em] mt-4 md:mt-6 leading-relaxed">
+                CLASSIFIED PRODUCT<br>
+                STORAGE
+            </p>
+        </section>
+
+        <!-- 商品カードエリア -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-8 md:mt-0">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+                
+                <!-- Card 1 -->
+                <article class="group relative cyber-card bg-fhw-gray fhw-card-bg border border-fhw-cyan/40 p-1 transition-all duration-300 hover:border-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.2)] hover:-translate-y-1">
+                    <div class="h-full bg-fhw-dark dark:bg-fhw-dark light:bg-zinc-100 p-5 flex flex-col justify-between cyber-card relative overflow-hidden">
+                        <!-- ホバー時の走査線エフェクト -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-fhw-lime/5 to-transparent -translate-y-full group-hover:animate-[scan_2s_ease-in-out_infinite] z-0 pointer-events-none"></div>
+
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-6 border-b border-fhw-cyan/20 pb-2">
+                                <span class="font-rajdhani font-bold text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 01</span>
+                                <span class="text-xs font-rajdhani text-zinc-500">SYS.ON</span>
+                            </div>
+                            
+                            <div class="aspect-square bg-zinc-900 border border-zinc-800 mb-6 flex items-center justify-center overflow-hidden relative group/img">
+                                <!-- ダミー画像配置エリア -->
+                                <div class="absolute inset-0 bg-metal-texture opacity-50"></div>
+                                <span class="text-6xl group-hover/img:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] relative z-10">🍔🏎️</span>
+                            </div>
+
+                            <h2 class="font-oswald font-bold text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">MONSTER TRUCK BURGER</h2>
+                            <p class="font-rajdhani font-medium text-fhw-cyan text-sm mb-1 uppercase tracking-wider">Instant Download</p>
+                            <p class="text-zinc-400 text-sm mb-6">Printable Wall Art</p>
+                        </div>
+
+                        <button class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-rajdhani font-bold tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-dark">
+                            <span class="absolute inset-0 bg-fhw-lime translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <span class="text-xs opacity-50">&gt;</span> VIEW ITEM
+                            </span>
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Card 2 -->
+                <article class="group relative cyber-card bg-fhw-gray fhw-card-bg border border-fhw-cyan/40 p-1 transition-all duration-300 hover:border-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.2)] hover:-translate-y-1">
+                    <div class="h-full bg-fhw-dark dark:bg-fhw-dark light:bg-zinc-100 p-5 flex flex-col justify-between cyber-card relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-fhw-lime/5 to-transparent -translate-y-full group-hover:animate-[scan_2s_ease-in-out_infinite] z-0 pointer-events-none"></div>
+
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-6 border-b border-fhw-cyan/20 pb-2">
+                                <span class="font-rajdhani font-bold text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 02</span>
+                                <span class="text-xs font-rajdhani text-zinc-500">SYS.ON</span>
+                            </div>
+                            
+                            <div class="aspect-square bg-zinc-900 border border-zinc-800 mb-6 flex items-center justify-center overflow-hidden relative group/img">
+                                <div class="absolute inset-0 bg-metal-texture opacity-50"></div>
+                                <span class="text-6xl group-hover/img:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] relative z-10">🌭🛹</span>
+                                <!-- ピンクのアクセントバッジ -->
+                                <div class="absolute top-2 right-2 bg-fhw-pink text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider transform rotate-3 shadow-[0_0_10px_rgba(255,0,85,0.5)] z-20">HOT!</div>
+                            </div>
+
+                            <h2 class="font-oswald font-bold text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">SKATER DOG POSTER</h2>
+                            <p class="font-rajdhani font-medium text-fhw-cyan text-sm mb-1 uppercase tracking-wider">Instant Download</p>
+                            <p class="text-zinc-400 text-sm mb-6">Printable Wall Art</p>
+                        </div>
+
+                        <button class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-rajdhani font-bold tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-dark">
+                            <span class="absolute inset-0 bg-fhw-lime translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <span class="text-xs opacity-50">&gt;</span> VIEW ITEM
+                            </span>
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Card 3 -->
+                <article class="group relative cyber-card bg-fhw-gray fhw-card-bg border border-fhw-cyan/40 p-1 transition-all duration-300 hover:border-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.2)] hover:-translate-y-1">
+                    <div class="h-full bg-fhw-dark dark:bg-fhw-dark light:bg-zinc-100 p-5 flex flex-col justify-between cyber-card relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-fhw-lime/5 to-transparent -translate-y-full group-hover:animate-[scan_2s_ease-in-out_infinite] z-0 pointer-events-none"></div>
+
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-6 border-b border-fhw-cyan/20 pb-2">
+                                <span class="font-rajdhani font-bold text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 03</span>
+                                <span class="text-xs font-rajdhani text-zinc-500">SYS.ON</span>
+                            </div>
+                            
+                            <div class="aspect-square bg-zinc-900 border border-zinc-800 mb-6 flex items-center justify-center overflow-hidden relative group/img">
+                                <div class="absolute inset-0 bg-metal-texture opacity-50"></div>
+                                <span class="text-6xl group-hover/img:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] relative z-10">🍟🚀</span>
+                            </div>
+
+                            <h2 class="font-oswald font-bold text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">SPACE FRIES APPAREL</h2>
+                            <p class="font-rajdhani font-medium text-fhw-cyan text-sm mb-1 uppercase tracking-wider">T-Shirt / Hoodie</p>
+                            <p class="text-zinc-400 text-sm mb-6">Physical Item</p>
+                        </div>
+
+                        <button class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-rajdhani font-bold tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-dark">
+                            <span class="absolute inset-0 bg-fhw-lime translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <span class="text-xs opacity-50">&gt;</span> VIEW ITEM
+                            </span>
+                        </button>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- 世界観テキスト -->
+        <section class="mt-24 text-center px-4 relative">
+            <!-- 上部の装飾 -->
+            <div class="flex justify-center gap-1 mb-6 opacity-30">
+                <div class="w-1 h-1 bg-fhw-cyan"></div>
+                <div class="w-4 h-1 bg-fhw-cyan"></div>
+                <div class="w-1 h-1 bg-fhw-cyan"></div>
+            </div>
+            
+            <p class="font-rajdhani font-bold text-zinc-500 text-sm md:text-base tracking-[0.4em] leading-loose">
+                STORE THE MADNESS.<br>
+                <span class="text-fhw-cyan">HANDLE WITH FLAVOR.</span>
+            </p>
+        </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-fhw-cyan/20 bg-fhw-dark relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <!-- ロゴ・コピー -->
+                <div class="text-center md:text-left">
+                    <div class="font-oswald font-bold text-2xl text-white mb-2">FUNKY HOTDOG WORKS</div>
+                    <p class="text-zinc-500 font-rajdhani text-sm tracking-wider">© 2026 FUNKY HOTDOG WORKS. ALL RIGHTS RESERVED.</p>
+                </div>
+                
+                <!-- SNS / Shop Links -->
+                <div class="flex flex-wrap justify-center md:justify-end gap-6 font-rajdhani font-bold tracking-widest text-sm">
+                    <a href="#" class="text-zinc-400 hover:text-fhw-cyan transition-colors flex items-center gap-2">
+                        INSTAGRAM <span class="text-xs opacity-50">↗</span>
+                    </a>
+                    <a href="#" class="text-zinc-400 hover:text-fhw-cyan transition-colors flex items-center gap-2">
+                        YOUTUBE <span class="text-xs opacity-50">↗</span>
+                    </a>
+                    
+                    <div class="flex items-center gap-4 border-l border-zinc-800 pl-6">
+                        <a href="#" class="text-zinc-600 cursor-not-allowed flex items-center gap-2 group relative">
+                            ETSY
+                            <span class="absolute -top-3 -right-6 bg-zinc-800 text-[9px] px-1.5 py-0.5 text-zinc-400 group-hover:bg-fhw-pink group-hover:text-white transition-colors border border-zinc-700">SOON</span>
+                        </a>
+                        <a href="#" class="text-zinc-600 cursor-not-allowed flex items-center gap-2 group relative">
+                            AMAZON
+                            <span class="absolute -top-3 -right-6 bg-zinc-800 text-[9px] px-1.5 py-0.5 text-zinc-400 group-hover:bg-fhw-pink group-hover:text-white transition-colors border border-zinc-700">SOON</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Tailwindアニメーション用の定義 -->
+    <style>
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+    </style>
+
+    <!-- インタラクション用スクリプト -->
+    <script>
+        // ダークモード・ライトモード切り替え
+        function setTheme(theme) {
+            const html = document.documentElement;
+            const darkBtn = document.getElementById('theme-dark');
+            const lightBtn = document.getElementById('theme-light');
+
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                html.classList.remove('light');
+                darkBtn.classList.replace('opacity-40', 'opacity-100');
+                darkBtn.classList.remove('grayscale');
+                lightBtn.classList.replace('opacity-100', 'opacity-40');
+                lightBtn.classList.add('grayscale');
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                lightBtn.classList.replace('opacity-40', 'opacity-100');
+                lightBtn.classList.remove('grayscale');
+                darkBtn.classList.replace('opacity-100', 'opacity-40');
+                darkBtn.classList.add('grayscale');
+            }
+        }
+
+        // 言語切り替え（UIの見た目のみ）
+        function setLang(lang) {
+            const enBtn = document.getElementById('lang-en');
+            const jaBtn = document.getElementById('lang-ja');
+
+            if (lang === 'en') {
+                enBtn.classList.replace('opacity-40', 'opacity-100');
+                enBtn.classList.remove('grayscale');
+                jaBtn.classList.replace('opacity-100', 'opacity-40');
+                jaBtn.classList.add('grayscale');
+            } else {
+                jaBtn.classList.replace('opacity-40', 'opacity-100');
+                jaBtn.classList.remove('grayscale');
+                enBtn.classList.replace('opacity-100', 'opacity-40');
+                enBtn.classList.add('grayscale');
+            }
+        }
+    </script>
+</body>
+</html>
+
+
