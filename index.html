@@ -8,17 +8,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- インダストリアル感とファンキーさを出すフォント -->
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Rajdhani:wght@500;600;700&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- 極秘格納庫感を出すステンシルフォント(Black Ops One)と日本語フォント -->
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        oswald: ['Oswald', 'sans-serif'],
-                        rajdhani: ['Rajdhani', 'sans-serif'],
-                        sans: ['Noto Sans JP', 'sans-serif'],
+                        blackops: ['"Black Ops One"', 'sans-serif'], // 英語フォントを統一
+                        sans: ['"Noto Sans JP"', 'sans-serif'],      // 日本語フォント
                     },
                     colors: {
                         fhw: {
@@ -44,16 +43,65 @@
             overflow-x: hidden;
         }
 
-        /* スモークエフェクト */
+        /* スモークエフェクト（限界まで控えめに調整） */
         .bg-smoke {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 60%);
+            background: radial-gradient(circle at 50% 30%, rgba(0, 240, 255, 0.015) 0%, transparent 60%);
             z-index: -1;
             pointer-events: none;
+        }
+
+        /* --- ヒーロータイトル用（光と文字の分離） --- */
+        /* 背面の固定された光 */
+        .glow-fixed {
+            color: transparent; /* 文字本体は透明にして、影（光）だけを残す！ */
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.9),
+                         0 0 20px rgba(0, 240, 255, 0.7),
+                         0 0 35px rgba(0, 240, 255, 0.5),
+                         0 0 50px rgba(0, 240, 255, 0.3);
+        }
+        /* 前面の動くマットブラック文字 */
+        .text-front {
+            color: #0a0a0c;
+            /* 背景に溶け込まないようにごく薄いフチ取りだけ残す */
+            -webkit-text-stroke: 1px rgba(0, 240, 255, 0.1);
+        }
+        
+        /* ライトモード時の調整 */
+        html.light body {
+            background-color: #f4f4f5;
+            color: #18181b;
+        }
+        html.light .fhw-card-bg {
+            background-color: #ffffff;
+        }
+        html.light .glow-fixed {
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.9),
+                         0 0 20px rgba(0, 240, 255, 0.7),
+                         0 0 35px rgba(0, 240, 255, 0.5),
+                         0 0 50px rgba(0, 240, 255, 0.3);
+        }
+        html.light .text-front {
+            color: #f4f4f5;
+            -webkit-text-stroke: 1px rgba(0, 240, 255, 0.2);
+        }
+
+        /* --- ヒーロータイトルの微妙な浮遊＆偏りアニメーション --- */
+        /* 文字だけが動き、背後の光は動かないことで「光が漏れる方向が変わる」演出 */
+        @keyframes slow-move {
+            0% { transform: translate(0px, 0px) scale(1); }
+            25% { transform: translate(3px, -2px) scale(1.004); }
+            50% { transform: translate(-2px, 3px) scale(1.008); }
+            75% { transform: translate(-3px, -1px) scale(1.004); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-slow-move {
+            animation: slow-move 10s ease-in-out infinite;
         }
 
         /* 近未来風カード装飾 */
@@ -63,15 +111,6 @@
         
         .cyber-button {
             clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
-        }
-
-        /* ライトモード時の調整 */
-        html.light body {
-            background-color: #f4f4f5;
-            color: #18181b;
-        }
-        html.light .fhw-card-bg {
-            background-color: #ffffff;
         }
 
         /* --- 言語切り替え用CSS --- */
@@ -116,7 +155,7 @@
                 <!-- 右：コントロール群 -->
                 <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                     <!-- 言語切り替え -->
-                    <div class="flex items-center space-x-1 bg-black/50 border border-fhw-cyan/30 rounded-full px-2 py-1 text-xs sm:text-sm font-rajdhani">
+                    <div class="flex items-center space-x-1 bg-black/50 border border-fhw-cyan/30 rounded-full px-2 py-1 text-xs sm:text-sm font-blackops">
                         <button id="lang-en" class="opacity-100 hover:opacity-80 transition-opacity w-5 sm:w-6 text-center" onclick="setLang('en')">🇺🇸</button>
                         <span class="text-fhw-cyan/50 text-[10px] sm:text-xs">|</span>
                         <button id="lang-ja" class="opacity-40 hover:opacity-100 transition-opacity w-5 sm:w-6 text-center grayscale" onclick="setLang('ja')">🇯🇵</button>
@@ -144,14 +183,20 @@
             <section class="relative pt-8 md:pt-12 pb-6 md:pb-8 px-4 text-center">
                 
                 <div class="inline-block relative w-full">
-                    <h1 class="font-oswald font-bold text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] tracking-[0.05em] text-white dark:text-white light:text-fhw-dark drop-shadow-[0_0_20px_rgba(0,240,255,0.4)] mb-2 relative z-10 leading-[1.1] py-2">
+                    <!-- 【背面】固定された発光 -->
+                    <h1 class="absolute inset-0 font-blackops uppercase text-7xl sm:text-8xl md:text-[8rem] lg:text-[10rem] tracking-normal glow-fixed mb-2 z-0 leading-[1] py-2 pointer-events-none">
+                        FUNKY<br class="md:hidden"> STORAGE
+                    </h1>
+                    
+                    <!-- 【前面】動くマットブラックの文字 -->
+                    <h1 class="font-blackops uppercase text-7xl sm:text-8xl md:text-[8rem] lg:text-[10rem] tracking-normal text-front mb-2 relative z-10 leading-[1] py-2 animate-slow-move origin-center">
                         FUNKY<br class="md:hidden"> STORAGE
                     </h1>
                 </div>
                 
                 <!-- サブタイトル（CSS言語切り替え対応） -->
-                <p class="text-fhw-cyan text-base md:text-xl mt-2 md:mt-4 leading-relaxed">
-                    <span class="lang-en is-block font-rajdhani font-semibold tracking-[0.3em]">
+                <p class="text-fhw-cyan text-base md:text-xl mt-2 md:mt-4 leading-relaxed relative z-20">
+                    <span class="lang-en is-block font-blackops tracking-[0.3em]">
                         STACKED AND READY.<br>
                         YOUR MOVE.
                     </span>
@@ -175,8 +220,8 @@
 
                             <div class="relative z-10">
                                 <div class="flex justify-between items-start mb-6 border-b border-fhw-cyan/20 pb-2">
-                                    <span class="font-rajdhani font-bold text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 01</span>
-                                    <span class="text-xs font-rajdhani text-zinc-500">SYS.ON</span>
+                                    <span class="font-blackops text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 01</span>
+                                    <span class="text-xs font-blackops text-zinc-500">SYS.ON</span>
                                 </div>
                                 
                                 <div class="aspect-square bg-zinc-900 border border-zinc-800 mb-6 flex items-center justify-center overflow-hidden relative group/img">
@@ -186,13 +231,13 @@
                                     <img src="JUMP.jpg" alt="MONSTER TRUCK BURGER" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 relative z-0">
                                 </div>
 
-                                <h2 class="font-oswald font-bold text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">MONSTER TRUCK BURGER</h2>
-                                <p class="font-rajdhani font-medium text-fhw-cyan text-sm mb-1 uppercase tracking-wider">Instant Download</p>
-                                <p class="text-zinc-400 text-sm mb-6">Printable Wall Art</p>
+                                <h2 class="font-blackops text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">MONSTER TRUCK BURGER</h2>
+                                <p class="font-blackops text-fhw-cyan text-sm mb-1 uppercase tracking-wider">Instant Download</p>
+                                <p class="text-zinc-400 font-sans text-sm mb-6">Printable Wall Art</p>
                             </div>
 
                             <!-- 【第2段階＆第3段階】枠発光＆クリックで遷移 -->
-                            <button onclick="goToProduct('https://funkyhotdogworks.gumroad.com/l/vqqop')" class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-rajdhani font-bold tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.6)] active:scale-95 active:bg-white/10">
+                            <button onclick="goToProduct('https://funkyhotdogworks.gumroad.com/l/vqqop')" class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-blackops tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.6)] active:scale-95 active:bg-white/10">
                                 
                                 <!-- テキストとアイコン -->
                                 <span class="relative z-10 flex items-center justify-center gap-2 group-active/btn:scale-105 transition-transform duration-100">
@@ -214,22 +259,22 @@
 
                             <div class="relative z-10">
                                 <div class="flex justify-between items-start mb-6 border-b border-fhw-cyan/20 pb-2">
-                                    <span class="font-rajdhani font-bold text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 02</span>
-                                    <span class="text-xs font-rajdhani text-zinc-500">SYS.ON</span>
+                                    <span class="font-blackops text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 02</span>
+                                    <span class="text-xs font-blackops text-zinc-500">SYS.ON</span>
                                 </div>
                                 
                                 <div class="aspect-square bg-zinc-900 border border-zinc-800 mb-6 flex items-center justify-center overflow-hidden relative group/img">
                                     <div class="absolute inset-0 bg-metal-texture opacity-50"></div>
                                     <span class="text-6xl group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] relative z-10">🌭🛹</span>
-                                    <div class="absolute top-2 right-2 bg-fhw-pink text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider transform rotate-3 shadow-[0_0_10px_rgba(255,0,85,0.5)] z-20 group-hover:scale-110 transition-transform">HOT!</div>
+                                    <div class="absolute top-2 right-2 bg-fhw-pink text-white text-[10px] font-blackops px-2 py-1 uppercase tracking-wider transform rotate-3 shadow-[0_0_10px_rgba(255,0,85,0.5)] z-20 group-hover:scale-110 transition-transform">HOT!</div>
                                 </div>
 
-                                <h2 class="font-oswald font-bold text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">SKATER DOG POSTER</h2>
-                                <p class="font-rajdhani font-medium text-fhw-cyan text-sm mb-1 uppercase tracking-wider">Instant Download</p>
-                                <p class="text-zinc-400 text-sm mb-6">Printable Wall Art</p>
+                                <h2 class="font-blackops text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">SKATER DOG POSTER</h2>
+                                <p class="font-blackops text-fhw-cyan text-sm mb-1 uppercase tracking-wider">Instant Download</p>
+                                <p class="text-zinc-400 font-sans text-sm mb-6">Printable Wall Art</p>
                             </div>
 
-                            <button onclick="goToProduct('#')" class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-rajdhani font-bold tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.6)] active:scale-95 active:bg-white/10">
+                            <button onclick="goToProduct('#')" class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-blackops tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.6)] active:scale-95 active:bg-white/10">
                                 <span class="relative z-10 flex items-center justify-center gap-2 group-active/btn:scale-105 transition-transform duration-100">
                                     <span class="text-xs opacity-50 group-hover/btn:translate-x-1.5 group-hover/btn:opacity-100 transition-all duration-300">&gt;</span> 
                                     <span class="lang-en is-inline">BUY NOW</span>
@@ -247,8 +292,8 @@
 
                             <div class="relative z-10">
                                 <div class="flex justify-between items-start mb-6 border-b border-fhw-cyan/20 pb-2">
-                                    <span class="font-rajdhani font-bold text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 03</span>
-                                    <span class="text-xs font-rajdhani text-zinc-500">SYS.ON</span>
+                                    <span class="font-blackops text-fhw-cyan tracking-widest text-sm group-hover:text-fhw-lime transition-colors">STORAGE 03</span>
+                                    <span class="text-xs font-blackops text-zinc-500">SYS.ON</span>
                                 </div>
                                 
                                 <div class="aspect-square bg-zinc-900 border border-zinc-800 mb-6 flex items-center justify-center overflow-hidden relative group/img">
@@ -256,12 +301,12 @@
                                     <span class="text-6xl group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] relative z-10">🍟🚀</span>
                                 </div>
 
-                                <h2 class="font-oswald font-bold text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">SPACE FRIES APPAREL</h2>
-                                <p class="font-rajdhani font-medium text-fhw-cyan text-sm mb-1 uppercase tracking-wider">T-Shirt / Hoodie</p>
-                                <p class="text-zinc-400 text-sm mb-6">Physical Item</p>
+                                <h2 class="font-blackops text-2xl text-white dark:text-white light:text-fhw-dark leading-tight mb-2">SPACE FRIES APPAREL</h2>
+                                <p class="font-blackops text-fhw-cyan text-sm mb-1 uppercase tracking-wider">T-Shirt / Hoodie</p>
+                                <p class="text-zinc-400 font-sans text-sm mb-6">Physical Item</p>
                             </div>
 
-                            <button onclick="goToProduct('#')" class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-rajdhani font-bold tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.6)] active:scale-95 active:bg-white/10">
+                            <button onclick="goToProduct('#')" class="cyber-button w-full relative group/btn bg-fhw-dark dark:bg-fhw-dark light:bg-white border border-fhw-cyan text-fhw-cyan font-blackops tracking-widest py-3 overflow-hidden transition-all duration-300 hover:border-fhw-lime hover:text-fhw-lime hover:shadow-[0_0_20px_rgba(204,255,0,0.6)] active:scale-95 active:bg-white/10">
                                 <span class="relative z-10 flex items-center justify-center gap-2 group-active/btn:scale-105 transition-transform duration-100">
                                     <span class="text-xs opacity-50 group-hover/btn:translate-x-1.5 group-hover/btn:opacity-100 transition-all duration-300">&gt;</span> 
                                     <span class="lang-en is-inline">BUY NOW</span>
@@ -282,7 +327,7 @@
                     <div class="w-1 h-1 bg-fhw-cyan"></div>
                 </div>
                 
-                <p class="font-rajdhani font-bold text-zinc-500 text-sm md:text-base tracking-[0.4em] leading-loose">
+                <p class="font-blackops text-zinc-500 text-sm md:text-base tracking-[0.4em] leading-loose">
                     STORE THE MADNESS.<br>
                     <span class="text-fhw-cyan">HANDLE WITH FLAVOR.</span>
                 </p>
@@ -296,17 +341,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     <!-- ロゴ・コピー -->
                     <div class="text-center md:text-left">
-                        <div class="font-oswald font-bold text-2xl text-white mb-2">FUNKY HOTDOG WORKS</div>
-                        <p class="text-zinc-500 font-rajdhani text-sm tracking-wider">© 2026 FUNKY HOTDOG WORKS. ALL RIGHTS RESERVED.</p>
+                        <div class="font-blackops text-2xl text-white mb-2">FUNKY HOTDOG WORKS</div>
+                        <p class="text-zinc-500 font-blackops text-sm tracking-wider">© 2026 FUNKY HOTDOG WORKS. ALL RIGHTS RESERVED.</p>
                     </div>
                     
                     <!-- SNS / Shop Links -->
-                    <div class="flex flex-wrap justify-center md:justify-end gap-6 font-rajdhani font-bold tracking-widest text-sm">
+                    <div class="flex flex-wrap justify-center md:justify-end gap-6 font-blackops tracking-widest text-sm">
                         <a href="#" class="text-zinc-400 hover:text-fhw-cyan transition-colors flex items-center gap-2">
-                            INSTAGRAM <span class="text-xs opacity-50">↗</span>
+                            INSTAGRAM <span class="text-xs opacity-50 font-sans">↗</span>
                         </a>
                         <a href="#" class="text-zinc-400 hover:text-fhw-cyan transition-colors flex items-center gap-2">
-                            YOUTUBE <span class="text-xs opacity-50">↗</span>
+                            YOUTUBE <span class="text-xs opacity-50 font-sans">↗</span>
                         </a>
                         
                         <div class="flex items-center gap-4 border-l border-zinc-800 pl-6">
