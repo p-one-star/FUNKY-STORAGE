@@ -86,11 +86,11 @@
             
             <!-- 左：ロゴ（GitHubの画像を配置） -->
             <div class="flex-shrink-0 flex items-center cursor-pointer">
-                <img src="icon.PNG" alt="FHW LOGO" class="w-[100px] object-contain">
+                <!-- ロゴ画像だけを 10px 下に下げる（translate-y-[10px] を追加） -->
+                <img src="icon.PNG" alt="FHW LOGO" class="w-[100px] object-contain translate-y-[10px]">
             </div>
 
             <!-- 右：コントロール群 -->
-            <!-- モバイルで見切れないように gap を調整し、flex-shrink-0 で縮小を防ぐ -->
             <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                 <!-- 言語切り替え -->
                 <div class="flex items-center space-x-1 bg-black/50 border border-fhw-cyan/30 rounded-full px-2 py-1 text-xs sm:text-sm font-rajdhani">
@@ -118,12 +118,11 @@
     <main class="pt-24 pb-16">
         
         <!-- ヒーローセクション -->
-        <!-- 余白(pt)をガッツリ増やして大胆に下げました -->
-        <section class="relative pt-32 md:pt-40 pb-20 px-4 text-center">
+        <section class="relative pt-16 pb-20 px-4 text-center">
             
             <div class="inline-block relative w-full">
-                <!-- 文字サイズはキープ。フォント上部が切れないように py-2 を追加 -->
-                <h1 class="font-oswald font-bold text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] tracking-[0.05em] text-white dark:text-white light:text-fhw-dark drop-shadow-[0_0_20px_rgba(0,240,255,0.4)] mb-4 relative z-10 leading-none py-2">
+                <!-- 位置は元に戻しつつ、フォント上部が切れないように py-2 だけ残しています -->
+                <h1 class="font-oswald font-bold text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] tracking-[0.05em] text-white dark:text-white light:text-fhw-dark drop-shadow-[0_0_20px_rgba(0,240,255,0.4)] mb-4 relative z-10 leading-[1.1] py-2">
                     FUNKY<br class="md:hidden"> STORAGE
                 </h1>
             </div>
