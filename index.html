@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- インダストリアル感とファンキーさを出すフォント -->
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Rajdhani:wght@500;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Rajdhani:wght@500;600;700&family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -85,9 +85,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             
             <!-- 左：ロゴ（GitHubの画像を配置） -->
-            <div class="flex-shrink-0 flex items-center cursor-pointer">
-                <!-- ロゴ画像だけを 10px 下に下げる（translate-y-[10px] を追加） -->
-                <img src="icon.PNG" alt="FHW LOGO" class="w-[100px] object-contain translate-y-[10px]">
+            <!-- group クラスを追加して、ホバー判定をこのエリア全体に持たせる -->
+            <div class="flex-shrink-0 flex items-center cursor-pointer group">
+                <!-- 初期状態で -5度 傾け、ホバー/タップ時に拡大(scale-110)＆さらに傾斜(-12度)させる -->
+                <img src="icon.PNG" alt="FHW LOGO" class="w-[100px] object-contain translate-y-[10px] -rotate-[5deg] group-hover:scale-110 group-hover:-rotate-[12deg] group-active:scale-110 group-active:-rotate-[12deg] transition-transform duration-300 ease-out origin-center">
             </div>
 
             <!-- 右：コントロール群 -->
@@ -115,27 +116,35 @@
     </header>
 
     <!-- メインコンテンツ -->
-    <main class="pt-24 pb-16">
+    <main class="pt-20 pb-16">
         
         <!-- ヒーローセクション -->
-        <section class="relative pt-16 pb-20 px-4 text-center">
+        <section class="relative pt-8 md:pt-12 pb-6 md:pb-8 px-4 text-center">
             
             <div class="inline-block relative w-full">
                 <!-- 位置は元に戻しつつ、フォント上部が切れないように py-2 だけ残しています -->
-                <h1 class="font-oswald font-bold text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] tracking-[0.05em] text-white dark:text-white light:text-fhw-dark drop-shadow-[0_0_20px_rgba(0,240,255,0.4)] mb-4 relative z-10 leading-[1.1] py-2">
+                <h1 class="font-oswald font-bold text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] tracking-[0.05em] text-white dark:text-white light:text-fhw-dark drop-shadow-[0_0_20px_rgba(0,240,255,0.4)] mb-2 relative z-10 leading-[1.1] py-2">
                     FUNKY<br class="md:hidden"> STORAGE
                 </h1>
             </div>
             
-            <!-- サブタイトル -->
-            <p class="font-rajdhani font-semibold text-fhw-cyan text-base md:text-xl tracking-[0.3em] mt-4 md:mt-6 leading-relaxed">
-                CLASSIFIED PRODUCT<br>
-                STORAGE
+            <!-- サブタイトル（言語切り替え対応） -->
+            <p class="text-fhw-cyan text-base md:text-xl mt-2 md:mt-4 leading-relaxed">
+                <!-- 英語表示 -->
+                <span id="subcopy-en" class="font-rajdhani font-semibold tracking-[0.3em] block">
+                    STACKED AND READY.<br>
+                    YOUR MOVE.
+                </span>
+                <!-- 日本語表示 -->
+                <span id="subcopy-ja" class="font-sans font-bold tracking-[0.15em] hidden">
+                    並べてあるだけです。<br>
+                    あとは、あなた次第。
+                </span>
             </p>
         </section>
 
         <!-- 商品カードエリア -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-8 md:mt-0">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
                 
                 <!-- Card 1 -->
@@ -319,21 +328,37 @@
             }
         }
 
-        // 言語切り替え（UIの見た目のみ）
+        // 言語切り替え＆サブコピー切り替え
         function setLang(lang) {
             const enBtn = document.getElementById('lang-en');
             const jaBtn = document.getElementById('lang-ja');
+            const subEn = document.getElementById('subcopy-en');
+            const subJa = document.getElementById('subcopy-ja');
 
             if (lang === 'en') {
+                // ボタンの見た目
                 enBtn.classList.replace('opacity-40', 'opacity-100');
                 enBtn.classList.remove('grayscale');
                 jaBtn.classList.replace('opacity-100', 'opacity-40');
                 jaBtn.classList.add('grayscale');
+                
+                // サブコピーの表示切り替え
+                if(subEn && subJa) {
+                    subEn.classList.remove('hidden');
+                    subJa.classList.add('hidden');
+                }
             } else {
+                // ボタンの見た目
                 jaBtn.classList.replace('opacity-40', 'opacity-100');
                 jaBtn.classList.remove('grayscale');
                 enBtn.classList.replace('opacity-100', 'opacity-40');
                 enBtn.classList.add('grayscale');
+                
+                // サブコピーの表示切り替え
+                if(subEn && subJa) {
+                    subJa.classList.remove('hidden');
+                    subEn.classList.add('hidden');
+                }
             }
         }
     </script>
